@@ -21,6 +21,7 @@ class Settings(BaseSettings):
 
     # LLM
     llm_model_path: str
+    llm_model_name: str = "qwen2.5-3b-instruct"
     llm_n_ctx: int = Field(default=4096, gt=0)
     llm_n_threads: int = Field(default=4, gt=0)
     llm_n_gpu_layers: int = Field(default=0, ge=0)

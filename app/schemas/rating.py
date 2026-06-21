@@ -1,15 +1,39 @@
-from sqlalchemy import Integer, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column
-from datetime import datetime
-import uuid
+"""Pydantic schemas for battle/rating serialization."""
 
-from app.db.models.base import Base
+from pydantic import BaseModel
+
+from app.db.models.rating import ContentType
 
 
-class Rating(Base):
-    __tablename__ = "ratings"
+class BattleItem(BaseModel):
+    """A single content item presented in a battle."""
 
-    id: Mapped[str] = mapped_column(primary_key=True, default=lambda: str(uuid.uuid4()))
-    joke_id: Mapped[str] = mapped_column(ForeignKey("jokes.id"), nullable=False)
-    score: Mapped[int] = mapped_column(Integer, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    content_type: ContentType
+    content_id: int
+    content: str
+
+
+class BattlePairResponse(BaseModel):
+    """Two items presented for head-to-head voting."""
+
+    battle_id: str
+    challenger: BattleItem
+    opponent: BattleItem
+
+
+class VoteRequest(BaseModel):
+    """Client's submitted vote for a previously served battle."""
+
+    battle_id: str
+    winner_type: ContentType
+    winner_id: int
+
+
+class RatingResponse(BaseModel):
+    """Result of a recorded vote, including updated ELO deltas."""
+
+    id: int
+    challenger_elo_before: float
+    opponent_elo_before: float
+    challenger_elo_delta: float
+    opponent_elo_delta: float
